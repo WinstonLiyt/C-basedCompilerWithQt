@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/detail">
+        <file>icon/AI.svg</file>
+    </qresource>
+</RCC>

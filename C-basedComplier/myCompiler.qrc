@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/fileCreate.png</file>
+        <file>icon/icon.png</file>
+        <file>icon/fileGenSave.png</file>
+        <file>icon/treeGen.png</file>
+        <file>icon/analyze.png</file>
+        <file>icon/document.png</file>
+        <file>icon/fileEdit.png</file>
+        <file>icon/fileUpload.png</file>
+        <file>icon/nodeGraph.png</file>
+        <file>icon/table.png</file>
+        <file>icon/code.png</file>
+        <file>icon/data-flow.png</file>
+        <file>icon/fileSave.png</file>
+        <file>icon/hint.png</file>
+        <file>icon/res.png</file>
+    </qresource>
+</RCC>
