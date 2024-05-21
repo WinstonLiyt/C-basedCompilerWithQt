@@ -3,8 +3,6 @@
 #ifndef _INTERCODEGENERATOR_H
 #define _INTERCODEGENERATOR_H
 
-//@func   :  中间代码生成头文件
-
 #include <cstring>
 #include <list>
 #include <vector>
@@ -19,7 +17,7 @@
 
 using namespace std;
 
-//@func : 生成四元式的Label
+// 生成四元式的Label
 class LabelGenerator
 {
 private:
@@ -35,7 +33,6 @@ public:
     int refresh();
 };
 
-//@func :
 class IntermediateCodeGenerator
 {
 public:
@@ -53,22 +50,20 @@ private:
 public:
     void Initialize();
     int NextQuaternaryIndex();
-    // vector<Quaternary> GetQuaternaries(void);
-
-    void emit_1(Quaternary q);                                  // 生成四元式
+    void emit_1(Quaternary q);
     void Emit(string op, string src1, string src2, string dst); // 生成四元式
     void BackPatch(list<int> nextList, int quad);               // 代码回填
 
     void DivideIntoFunctionBlocks(vector<Func> funcTable); // 划分功能块
     vector<FuncBlock> *GetFunctionBlocks(void);            // 返回功能块
 
-    void Output();                     // 输出
-    void Output(ostream &out);         // 输出
-    void Output(const char *fileName); // 输出
+    void Output();
+    void Output(ostream &out);
+    void Output(const char *fileName);
 
-    void OutputFunctionBlocks(void);                 // 输出
-    void OutputFunctionBlocks(ostream &out);         // 输出
-    void OutputFunctionBlocks(const char *fileName); // 输出
+    void OutputFunctionBlocks(void);
+    void OutputFunctionBlocks(ostream &out);
+    void OutputFunctionBlocks(const char *fileName);
 
     int refresh(void);
 };

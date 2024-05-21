@@ -37,7 +37,7 @@ Var *Compile_Analyzer::searchVariable(string ID)
     return NULL;
 }
 
-// @func : 输出状态栈和符号栈
+// 输出状态栈和符号栈
 void Compile_Analyzer::outputStack(ostream &fileout)
 {
     int NUM_STATE = 8;
@@ -105,7 +105,7 @@ int Compile_Analyzer::regular_LR1(const char *AnalyzeProcess, const char *SynTax
     // 移进归约
     for (int wordsLocation = 0;;)
     {
-        //------------------------获取当前状态和当前符号，下一状态------------------------
+        // 获取当前状态和当前符号，下一状态
         int currentState = stateStack.top();
         int str = tokens[wordsLocation].id;
         string tokenType = tokens[wordsLocation].tokenType;
@@ -116,7 +116,7 @@ int Compile_Analyzer::regular_LR1(const char *AnalyzeProcess, const char *SynTax
         int nextState = tableLR1[currentState][str];
         int judge = shiftReduceTable[currentState][str];
 
-        //------------------------下一个符号的转化------------------------
+        // 下一个符号的转化
         Symbol *nextSymbol;
         if (tokenType == "Identifier")
             nextSymbol = new Identifier(Symbol{true, "Identifier"}, tokenValue);
@@ -125,7 +125,7 @@ int Compile_Analyzer::regular_LR1(const char *AnalyzeProcess, const char *SynTax
         else
             nextSymbol = new Symbol(true, tokenType);
 
-        //------------------------根据LR1表进行跳转------------------------
+        // 根据LR1表进行跳转
         // 空白错误态
         if (nextState == TBSTATE_NONE)
         {
@@ -388,8 +388,8 @@ int Compile_Analyzer::regular_LR1(const char *AnalyzeProcess, const char *SynTax
                 Symbol *_while = popSymbol();
                 WhileSentence *while_sentence = new WhileSentence(*(new Symbol(false, "while_sentence")));
                 interCodeGenerator.BackPatch(sentence_block->nextList, m->quad); // 回填M四元式的地址
-                while_sentence->nextList = expression->falseList;                //
-                interCodeGenerator.Emit("j", "_", "_", to_string(m->quad));      // EMIT
+                while_sentence->nextList = expression->falseList;
+                interCodeGenerator.Emit("j", "_", "_", to_string(m->quad)); // EMIT
                 pushSymbol(while_sentence);
                 break;
             }

@@ -2,15 +2,12 @@
 #ifndef _ANALYZER_H
 #define _ANALYZER_H
 
-//@func   :  分析头文件
-
 #include "lexialAnalyzer.h"
 #include "syntaxAnalyzer.h"
 #include "semanticAnalyzer.h"
 #include "interCodeGenerator.h"
 #include "objCodeGenerator.h"
 
-//@func :
 class Compile_Analyzer
 {
 
@@ -50,7 +47,7 @@ public:
 	void generateSyntaxTree(stack<vector<int>> &parseStack, const char *outputFilePath); // cmd打印树
 
 	// 语义分析函数
-	void outputStack(ostream &fileout);
+	void outputStack(ostream &fileout); // 输出状态栈和符号栈
 	Symbol *popSymbol();
 	void pushSymbol(Symbol *sym);
 	Func *searchFunction(string ID);

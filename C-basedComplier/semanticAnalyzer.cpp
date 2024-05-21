@@ -1,5 +1,3 @@
-//@func   :  语义分析
-
 #include "semanticAnalyzer.h"
 
 bool operator==(const Symbol &x, const Symbol &y)

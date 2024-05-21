@@ -1,5 +1,3 @@
-//@func   :  语法分析器
-
 #include "syntaxAnalyzer.h"
 
 /* item项目集 */
@@ -59,7 +57,7 @@ int syntaxAnalyzer::itemSetSearch(vector<Item> &a, vector<vector<Item>> &b)
 }
 
 // 读取并初始化产生式：将文本形式的产生式转换为数字形式，用于内部处理。
-vector<int> syntaxAnalyzer::init_one_production(const char *_pattern)
+vector<int> syntaxAnalyzer::initProduc(const char *_pattern)
 {
     vector<int> tmp;           // 用来存储转换后的产生式的数字表示。
     string pattern = _pattern; // 将传入的C风格字符串转换为C++风格的字符串，便于处理。
@@ -108,7 +106,7 @@ void syntaxAnalyzer::initAnalyzer()
     this->productionNum = sizeof(PATTERNS) / sizeof(PATTERNS[0]);
 
     // 初始化转换数组
-    //  V和Vstr是用于存储终结符和非终结符的映射。V是从字符串到整数的映射，而Vstr是从整数到字符串的映射。
+    // Map和Vstr是用于存储终结符和非终结符的映射。Map是从字符串到整数的映射，而Str是从整数到字符串的映射。
     symbolMap.clear();
     symbolStr.clear();
 
@@ -130,27 +128,24 @@ void syntaxAnalyzer::initAnalyzer()
         symbolMap[string(VNNAMES[i])] = index++;
     }
 
-    // 调整参数episilon变化为终结符
-    //  构建LR(1)分析表时，需要将空串作为一个特殊的终结符处理。
+    // 【调整参数episilon变化为终结符】
+    // 构建LR(1)分析表时，需要将空串作为一个特殊的终结符处理。
     numVt++;               // 86[##-0 + VT-1~85]
     this->epsilon = numVt; // epsilon-86 即 emptypro
 
-    // 初始化 vector<vector<int>> production;  vector<string> getProduce;
-    //  production存储所有产生式的数字表示，而getProduce为每个非终结符存储其对应产生式的编号。
+    // production->产生式的数字表示；getProduce->终结符对应产生式的编号
     production.clear();
     getProduce.clear();
     getProduce.resize(numVt + numVn, "");
 
     for (int i = 0; i < productionNum - 1; i++)
     {
-        // 遍历PATTERNS数组，将文本形式的产生式通过init_one_production()函数转换为数字表示，并添加到production中。
-        vector<int> tmp = init_one_production(PATTERNS[i]); // 先不检查错误回头再看
-        getProduce[tmp[0]] += ('\0' + i);                   // 每个非终结符对应的产生式编号
+        // 遍历PATTERNS数组，将文本形式的产生式转换为数字表示，并添加到production中。
+        vector<int> tmp = initProduc(PATTERNS[i]); // 先不检查错误回头再看
+        getProduce[tmp[0]] += ('\0' + i);          // 每个非终结符对应的产生式编号
         production.push_back(tmp);
     }
 }
-
-//-----------------------------------------------------------------------
 
 // 计算First集合的辅助函数：对给定的字符串进行unique_add操作，确保结果集中没有重复元素。
 string addB2A(string str_a, string str_b)
@@ -176,9 +171,6 @@ string addB2A(string str_a, char ch_b)
     return ans;
 }
 
-//@func     : 当前的符号，和对应产生式编号,搜索数组
-//@notice   : nv 非终结符 / nump 产生式编号 / getted 记录是否搜索
-//@notice   : emptypro相当于EPISILON
 // 深度优先搜索计算First集合：对给定的非终结符和产生式编号进行DFS，计算其First集。
 void syntaxAnalyzer::dfs(int nv, int nump, vector<bool> &getted)
 {
@@ -266,7 +258,7 @@ void syntaxAnalyzer::getFirstSet()
     }
 }
 
-// 计算给定项目的闭包：对给定的项目进行闭包运算，得到包含所有可达项目的集合。
+// 计算给定项目的闭包：对给定的项目进行闭包运算，得到包含所有可达项目的集合
 vector<Item> syntaxAnalyzer::getItemClosure(Item item)
 {
     vector<Item> closureSet;
@@ -331,8 +323,7 @@ vector<Item> syntaxAnalyzer::getItemClosure(Item item)
     return closureSet;
 }
 
-// 构建项目集族：从初始项目集开始，逐步扩展，构建整个项目集族。
-//@func : 获得项目集族
+// 从初始项目集开始，逐步扩展，构建整个项目集簇
 void syntaxAnalyzer::getItemSet()
 {
     head.resize(MAXN, -1);
@@ -387,46 +378,14 @@ void syntaxAnalyzer::getItemSet()
     }
 }
 
-// 打印项目集族：用于调试和展示项目集族的结构。
-//@func : 打印项目集族
-void syntaxAnalyzer::print_item_set()
-{
-    for (int i = 0; i < itemSet.size(); i++)
-    {
-        cout << "项目集" << i << ":" << endl;
-        for (int j = 0; j < itemSet[i].size(); j++)
-        {
-            cout << "{";
-            for (int k = 0; k < production[itemSet[i][j].nump].size(); k++)
-            {
-                cout << production[itemSet[i][j].nump][k] << ",";
-            }
-            cout << "}";
-            cout << " " << itemSet[i][j].ppos << " ";
-            for (auto i : itemSet[i][j].forward)
-                cout << i;
-            cout << endl;
-        }
-        cout << endl;
-    }
-    for (int i = 0; i < itemSet.size(); i++)
-    {
-        for (int j = head[i]; j != -1; j = edges[j].from)
-        {
-            cout << "  " << symbolStr[edges[j].weight] << endl;
-            cout << i << "--->" << edges[j].toItemSet << endl;
-        }
-    }
-}
-
 void syntaxAnalyzer::printItemSetDetails() const
 {
     auto filename = (srcPath + "itemSet.txt").c_str();
     ofstream out(filename);
     if (!out.is_open())
     {
-        cerr << "can not open file " << filename << "\n";
-        Message += "[error] can not open file ";
+        cerr << "无法打开文件 " << filename << "\n";
+        Message += "【错误】 无法打开文件！";
         Message += filename;
         Message += "\n";
         return;
@@ -464,8 +423,7 @@ void syntaxAnalyzer::printItemSetDetails() const
     }
 }
 
-// 生成LR(1)分析表：根据构建的项目集族和转移关系，生成LR(1)分析表。
-//@func : 获得LR1分析表 table[i][j] = w:状态i --> j,读入符号W
+// 根据构建的项目集族和转移关系，生成LR(1)分析表【table[i][j] = w:状态i --> j，读入符号W】
 bool syntaxAnalyzer::genLR1Table()
 {
     // 初始化表格大小和默认值
@@ -516,9 +474,6 @@ bool syntaxAnalyzer::genLR1Table()
     return true;
 }
 
-//-----------------------------------------------------------------------
-
-//@func : 打印LR1分析表
 void syntaxAnalyzer::printLR1Table(const char *filename)
 {
     ofstream out(filename);
@@ -548,7 +503,7 @@ void syntaxAnalyzer::printLR1Table(const char *filename)
             else if (tableLR1[i][j] == TBSTATE_NONE)
                 out << "*" << ' '; // 空
             else if (shiftReduceTable[i][j] == TBSTATE_SHIFT)
-                out << "s" << tableLR1[i][j] << ' '; // 移近
+                out << "s" << tableLR1[i][j] << ' '; // 移进
             else if (shiftReduceTable[i][j] == TBSTATE_REGULAR)
                 out << "r" << tableLR1[i][j] << ' '; // 归约
         }
@@ -592,7 +547,7 @@ void syntaxAnalyzer::genActionGOTOTable(const char *filename)
             else if (tableLR1[i][j] == TBSTATE_NONE)
                 out << "*" << ' '; // 空
             else if (shiftReduceTable[i][j] == TBSTATE_SHIFT)
-                out << "s" << tableLR1[i][j] << ' '; // 移近
+                out << "s" << tableLR1[i][j] << ' '; // 移进
             else if (shiftReduceTable[i][j] == TBSTATE_REGULAR)
                 out << "r" << tableLR1[i][j] << ' '; // 归约
         }
@@ -630,7 +585,7 @@ void syntaxAnalyzer::genActionGOTOTableCSV(const char *filename)
             else if (tableLR1[i][j] == TBSTATE_NONE)
                 out << "\"*\""; // 空
             else if (shiftReduceTable[i][j] == TBSTATE_SHIFT)
-                out << "\"s" << tableLR1[i][j] << "\""; // 移近
+                out << "\"s" << tableLR1[i][j] << "\""; // 移进
             else if (shiftReduceTable[i][j] == TBSTATE_REGULAR)
                 out << "\"r" << tableLR1[i][j] << "\""; // 归约
         }
@@ -648,7 +603,7 @@ void syntaxAnalyzer::genActionGOTOTableCSV(const char *filename)
     out.close();
 }
 
-//@func : 将LR1表的信息存储到文件中
+// 将LR1表的信息存储到文件中
 void syntaxAnalyzer::genLR1Table_2(const char *filename)
 {
     int row = itemSet.size(), col = numVt + numVn;
@@ -665,7 +620,7 @@ void syntaxAnalyzer::genLR1Table_2(const char *filename)
     }
 }
 
-//@func : 将tableSR表的信息存储到文件中
+// 将tableSR表的信息存储到文件中
 void syntaxAnalyzer::genSRTable(const char *filename)
 {
     int row = itemSet.size(), col = numVt + numVn;
@@ -681,7 +636,7 @@ void syntaxAnalyzer::genSRTable(const char *filename)
     }
 }
 
-//@func : 将产生式存储到文件中
+// 将产生式存储到文件中
 void syntaxAnalyzer::genLR1Production(const char *filename)
 {
     ofstream out(filename);
@@ -697,7 +652,7 @@ void syntaxAnalyzer::genLR1Production(const char *filename)
     }
 }
 
-//@func : 从文件中读取LR1表的信息
+// 从文件中读取LR1表的信息
 vector<vector<int>> syntaxAnalyzer::load_LR1Table(const char *filename)
 {
     tableLR1.resize(MAXN);
@@ -718,7 +673,7 @@ vector<vector<int>> syntaxAnalyzer::load_LR1Table(const char *filename)
 
     return this->tableLR1;
 }
-//@func : 从文件中读取tableSR表的信息
+// 从文件中读取tableSR表的信息
 vector<vector<int>> syntaxAnalyzer::load_s_r_Table(const char *filename)
 {
     shiftReduceTable.resize(MAXN);
@@ -740,7 +695,7 @@ vector<vector<int>> syntaxAnalyzer::load_s_r_Table(const char *filename)
     return this->shiftReduceTable;
 }
 
-//@func : 从文件中读取产生式的信息
+// 从文件中读取产生式的信息
 vector<vector<int>> syntaxAnalyzer::load_LR1Production(const char *filename)
 {
     ifstream in(filename);
@@ -762,10 +717,7 @@ vector<vector<int>> syntaxAnalyzer::load_LR1Production(const char *filename)
     return this->production;
 }
 
-//-----------------------------------------------------------------------
-
-//@func : 生成分析表并存在文件中
-int syntaxAnalyzer::syntax_analyze_LR1Table(const char *LR1show, const char *LR1, const char *LR1SR, const char *LR1Produncton)
+int syntaxAnalyzer::syntaxAnalyzeLR1Table(const char *LR1show, const char *LR1, const char *LR1SR, const char *LR1Produncton)
 {
     this->initAnalyzer();
     this->getFirstSet();
@@ -774,8 +726,8 @@ int syntaxAnalyzer::syntax_analyze_LR1Table(const char *LR1show, const char *LR1
 
     if (!this->genLR1Table())
     {
-        cout << "This Grammar is not a LR(1) Grammar !" << endl;
-        Message += "[error] This Grammar is not a LR(1) Grammar !\n";
+        cout << "该文法不是LR（1）文法！" << endl;
+        Message += "【错误】 该文法不是LR（1）文法！\n";
         return RETURN_ERROR;
     }
     this->printLR1Table(LR1show); // 输出LR1分析表

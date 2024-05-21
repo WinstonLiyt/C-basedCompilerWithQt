@@ -3,8 +3,6 @@
 #ifndef _SEMANALYZER_H
 #define _SEMANALYZER_H
 
-//@func   :  语义分析头文件
-
 #include <string>
 #include <list>
 

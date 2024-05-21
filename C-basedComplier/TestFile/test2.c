@@ -1,5 +1,5 @@
-// winstonLi
-// 2024-03-17
+//@author : zhefeigong
+//@time    : 2023.5
 /*
 dadasdasd
 */
@@ -12,9 +12,9 @@ int demo(int a){
 int main(void){
 	int a;
 	int b;
-	int abc;
+	int gonzalez;
 	a=99;
 	b=999;
-	abc=demo(demo(a));
-	return abc;
+	gonzalez=demo(demo(a));
+	return gonzalez;
 }

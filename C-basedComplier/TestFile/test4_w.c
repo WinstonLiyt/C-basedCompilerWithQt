@@ -7,14 +7,12 @@ int demo(int a,int b){
 	return c;
 }
 int main(void){
-	int a;
-	int a;
-	int b;
-	b=1;
-	b=3;
-	a=12;
-	a=demo(a);
-	return a;
+	int x;
+	int y;
+	x=1;
+	y=12;
+	y=demo(y);
+	return y;
 
 }
 

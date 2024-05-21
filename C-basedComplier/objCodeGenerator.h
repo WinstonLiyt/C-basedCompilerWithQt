@@ -3,8 +3,6 @@
 #ifndef _OBJCODEGENERATOR_H
 #define _OBJCODEGENERATOR_H
 
-//@func   :  目标代码生成器
-
 #include <string>
 #include <vector>
 #include <map>
@@ -15,13 +13,9 @@
 
 #include "source.h"
 
-// #include"interCodeGenerator.h"
-
 using namespace std;
 
-//-----------------------------------------------------------------------
-
-//@func : 参数的待用活跃信息
+// 参数的待用活跃信息
 class VariableInfo
 {
 public:
@@ -33,7 +27,8 @@ public:
 	VariableInfo() {}
 	void print(ostream &fileout);
 };
-//@func : 带信息的四元式
+
+// 带信息的四元式
 class QuaternaryWithInfo
 {
 public:
@@ -46,7 +41,8 @@ public:
 
 	void print(ostream &fileout);
 };
-//@func : 带信息的四元式基本块
+
+// 带信息的四元式基本块
 struct InfoBlock
 {
 	string blockName;
@@ -55,8 +51,8 @@ struct InfoBlock
 	int nextBlock2;
 };
 
-//@func		: 生成目标代码
-//@notice : 保存临时常数-t0 t1寄存器 | 保存函数的返回值-v0寄存器
+// 生成目标代码
+// 保存临时常数-t0 t1寄存器 | 保存函数的返回值-v0寄存器
 class objectCodeGenerator
 {
 private:
@@ -77,7 +73,6 @@ private:
 	vector<QuaternaryWithInfo>::iterator currentQuaternary; // 当前分析的四元式
 	vector<string> generatedCode;							// 生成的目标代码
 
-private:
 	void storeVariable(string reg, string var);		// 将该数据存储到存储器中
 	void storeExitLiveVariables(set<string> &outl); // 存储活跃变量至存储器中
 	void releaseVariable(string var);				// 存储器中释放该数据
@@ -98,9 +93,6 @@ public:
 
 	int refresh(void); //	更新数据
 
-	// 结果输出
-	void outputEntryExitLiveVariables(ostream &fileout); // not used
-	void outputVariableOffsets(ostream &fileout);		 // not used
 	void outputInfoBlocksDetails(ostream &fileout);
 	void outputGeneratedCode(const char *fileName);
 };

@@ -1,53 +1,44 @@
-//@func   :  中间代码生成器
-
 #include "interCodeGenerator.h"
 #include "source.h"
 
-//-----------------------------------------------------------------------
-
-//@func :
 LabelGenerator::LabelGenerator()
 {
 	this->current_index = 0;
 	this->starting_point = 0;
 	this->base_label = "label";
 }
-//@func :
+
 LabelGenerator::LabelGenerator(const char *base_label)
 {
 	this->current_index = 0;
 	this->starting_point = 0;
 	this->base_label = base_label;
 }
-//@func :
+
 LabelGenerator::LabelGenerator(int index, const char *base_label)
 {
 	this->current_index = index;
 	this->starting_point = index;
 	this->base_label = base_label;
 }
-//@func :
+
 string LabelGenerator::new_label()
 {
 	return this->base_label + to_string(starting_point++);
 }
-//@func :
+
 int LabelGenerator::refresh()
 {
 	this->starting_point = this->current_index;
 	return RETURN_FINE;
 }
 
-//-----------------------------------------------------------------------
-
-//@func :
 IntermediateCodeGenerator::IntermediateCodeGenerator()
 {
 	this->blockLabelGenerator = LabelGenerator(0, "B");
 	this->blockFuncLabelGenerator = LabelGenerator(0, "F");
 }
 
-//@func :
 int IntermediateCodeGenerator::refresh()
 {
 	this->errorMessage.clear();
@@ -59,19 +50,16 @@ int IntermediateCodeGenerator::refresh()
 	return RETURN_FINE;
 }
 
-//-----------------------------------------------------------------------
-
-//@func :
 void IntermediateCodeGenerator::emit_1(Quaternary q)
 {
 	quaternaries.push_back(q);
 }
-//@func :
+
 void IntermediateCodeGenerator::Emit(string op, string src1, string src2, string dst)
 {
 	emit_1(Quaternary{op, src1, src2, dst});
 }
-//@func :
+
 void IntermediateCodeGenerator::BackPatch(list<int> nextList, int quad)
 {
 	for (list<int>::iterator iter = nextList.begin(); iter != nextList.end(); iter++)
@@ -80,14 +68,11 @@ void IntermediateCodeGenerator::BackPatch(list<int> nextList, int quad)
 	}
 }
 
-//-----------------------------------------------------------------------
-
-//@func :
 int IntermediateCodeGenerator::NextQuaternaryIndex()
 {
 	return quaternaries.size();
 }
-//@func :
+
 void IntermediateCodeGenerator::Output(ostream &out)
 {
 
@@ -102,12 +87,12 @@ void IntermediateCodeGenerator::Output(ostream &out)
 		out << endl;
 	}
 }
-//@func :
+
 void IntermediateCodeGenerator::Output()
 {
 	Output(cout);
 }
-//@func :
+
 void IntermediateCodeGenerator::Output(const char *fileName)
 {
 	ofstream fout;
@@ -123,7 +108,7 @@ void IntermediateCodeGenerator::Output(const char *fileName)
 	Output(fout);
 	fout.close();
 }
-//@func :
+
 void IntermediateCodeGenerator::OutputFunctionBlocks(ostream &out)
 {
 
@@ -169,50 +154,52 @@ void IntermediateCodeGenerator::OutputFunctionBlocks(const char *fileName)
 
 	fout.close();
 }
-//@func :
+
 vector<FuncBlock> *IntermediateCodeGenerator::GetFunctionBlocks()
 {
 	return &blockFunc;
 }
 
-void IntermediateCodeGenerator::GenerateDotGraphsForAllFuncBlocks() {
-    string dotFilename = (srcPath + "AllFuncBlocks.dot").c_str();  // 所有函数块的 .dot 文件名
-    string svgFilename = (srcPath + "AllFuncBlocks.svg").c_str();  // 目标 SVG 文件名
-    ofstream dotFile(dotFilename);
+void IntermediateCodeGenerator::GenerateDotGraphsForAllFuncBlocks()
+{
+	string dotFilename = (srcPath + "AllFuncBlocks.dot").c_str(); // 所有函数块的 .dot 文件名
+	string svgFilename = (srcPath + "AllFuncBlocks.svg").c_str(); // 目标 SVG 文件名
+	ofstream dotFile(dotFilename);
 
-    dotFile << "digraph AllFuncBlocks {\n";
-    dotFile << "    node [shape=record];\n";
+	dotFile << "digraph AllFuncBlocks {\n";
+	dotFile << "    node [shape=record];\n";
 
-    // 遍历所有的函数块
-    for (const auto& funcBlock : this->blockFunc) {
-        // 遍历函数块中的所有基本块
-        for (size_t i = 0; i < funcBlock.blocks.size(); ++i) {
-            const auto& block = funcBlock.blocks[i];
-            dotFile << "    " << funcBlock.serial << "_" << block.name << " [label=\"{" << block.name << "|";
+	// 遍历所有的函数块
+	for (const auto &funcBlock : this->blockFunc)
+	{
+		// 遍历函数块中的所有基本块
+		for (size_t i = 0; i < funcBlock.blocks.size(); ++i)
+		{
+			const auto &block = funcBlock.blocks[i];
+			dotFile << "    " << funcBlock.serial << "_" << block.name << " [label=\"{" << block.name << "|";
 
-            // 添加每个基本块中的四元式代码
-            for (const auto& code : block.codes)
-                dotFile << code.op << ", " << code.src1 << ", " << code.src2 << ", " << code.dst << "\\l";
-            dotFile << "}\"];\n";
+			// 添加每个基本块中的四元式代码
+			for (const auto &code : block.codes)
+				dotFile << code.op << ", " << code.src1 << ", " << code.src2 << ", " << code.dst << "\\l";
+			dotFile << "}\"];\n";
 
-            // 绘制转移
-            if (block.next1 != -1 && (size_t)block.next1 < funcBlock.blocks.size())
-                dotFile << "    " << funcBlock.serial << "_" << block.name << " -> " << funcBlock.serial << "_" << funcBlock.blocks[block.next1].name << ";\n";
-            if (block.next2 != -1 && (size_t)block.next2 < funcBlock.blocks.size())
-                dotFile << "    " << funcBlock.serial << "_" << block.name << " -> " << funcBlock.serial << "_" << funcBlock.blocks[block.next2].name << ";\n";
-        }
-    }
+			// 绘制转移
+			if (block.next1 != -1 && (size_t)block.next1 < funcBlock.blocks.size())
+				dotFile << "    " << funcBlock.serial << "_" << block.name << " -> " << funcBlock.serial << "_" << funcBlock.blocks[block.next1].name << ";\n";
+			if (block.next2 != -1 && (size_t)block.next2 < funcBlock.blocks.size())
+				dotFile << "    " << funcBlock.serial << "_" << block.name << " -> " << funcBlock.serial << "_" << funcBlock.blocks[block.next2].name << ";\n";
+		}
+	}
 
-    dotFile << "}\n";
-    dotFile.close();
+	dotFile << "}\n";
+	dotFile.close();
 
-    // 调用Graphviz的dot命令生成SVG文件
-    string command = "dot -Tsvg " + dotFilename + " -o " + svgFilename;
-    std::system(command.c_str());
+	// 调用Graphviz的dot命令生成SVG文件
+	string command = "dot -Tsvg " + dotFilename + " -o " + svgFilename;
+	std::system(command.c_str());
 }
 
-
-//@func : 功能块划分
+// 功能块划分
 void IntermediateCodeGenerator::DivideIntoFunctionBlocks(vector<Func> funcTable)
 {
 

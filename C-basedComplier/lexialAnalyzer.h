@@ -2,9 +2,6 @@
 #ifndef _LEXIALANAYZER_H
 #define _LEXIALANAYZER_H
 
-//@time   :  2022.10.7
-//@func   :  词法分析器头文件
-
 #include <cstring>
 #include <fstream>
 #include <sstream>
@@ -43,7 +40,7 @@ public:
     vector<lexWord> searchWords(const string &word);  // 根据前缀匹配单词
 };
 
-//------------------------------------ 词法分析类 ------------------------------------
+/* 词法分析类 */
 class lexialAnalyzer
 {
 private:
@@ -51,7 +48,7 @@ private:
     int sourceCodeLength = 0;  // 源代码长度
     int *charTypes = NULL;     // 文件中的每一个字符对应的类型
     vector<lexWord> fragments; // 分析之后得到的每个片段
-    PrefixTree trie;           // 字典树方便查找
+    PrefixTree trie;           // 字典树【方便查找】
 
     void preProcess(); // 处理宏定义、注释,字符，字符串，分隔符
     /* 词法判别（bool，int，float，标识符 */
@@ -62,14 +59,13 @@ private:
     void spiltType(string str, int start, int end, int type); // 存储分析结果
     int stLexAns(ofstream &outFile, ofstream &outFile2, string buffer, vector<lexWord> &res);
 
-    //======== 词法分析函数 ========
 public:
-    void lexialAnalyzeToken(const string &code); // 总的分析词法函数                                                     // 获取词法分析结果
+    void lexialAnalyzeToken(const string &code); // 获取词法分析结果
     int lexialAnalyze(const char *inPath = (folderPath + input).c_str(),
                       const char *outPath = (folderPath + lexResShow).c_str(),
-                      const char *outPath2 = (folderPath + lexOutput).c_str()); // 词法分析函数
+                      const char *outPath2 = (folderPath + lexOutput).c_str());
 
-    int initialLexicalAnalysis(); // lex初始化
-    int refresh(void);            // lex更新
+    int initialLexicalAnalysis();
+    int refresh(void);
 };
 #endif
