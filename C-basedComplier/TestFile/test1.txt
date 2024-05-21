@@ -27,8 +27,8 @@ int main(void){
 	int a;
 	int c;
 	a = 3;
-	b = 43;
-	c = 22;
+	b = 4;
+	c = 2;
 	c = b + a;
 	a = program(a, b, demo(c));
 	return a;

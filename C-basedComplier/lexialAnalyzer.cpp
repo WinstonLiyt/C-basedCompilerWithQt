@@ -4,20 +4,19 @@
 
 map<string, int> dic; // 字典，根据某个字符查询到对应的数组下标
 
-//@func : 根据前后排序
+/* 根据前后排序 */
 bool cmp(lexWord l, lexWord r)
 {
     return l.start < r.start;
 }
 
-//@func : 构造函数
 PrefixTree::PrefixTree()
 {
     isEndOfWord = false;
     memset(children, NULL, sizeof(children));
 }
 
-//@func : 字符串插入
+/* 字符串插入 */
 void PrefixTree::insert(const string &word, const int &t)
 {
     PrefixTree *node = this;
@@ -31,10 +30,11 @@ void PrefixTree::insert(const string &word, const int &t)
     node->wordType = t;
 }
 
+/* 在一个前缀树中搜索给定字符串word中所有可能的词 */
 vector<lexWord> PrefixTree::searchWords(const string &word)
 {
     int len = word.length();
-    vector<lexWord> matches;
+    vector<lexWord> matches; // 存储所有匹配的lexWord结构，每个lexWord记录匹配词的具体信息
     int start = 0;
 
     while (start < len)
@@ -61,7 +61,7 @@ vector<lexWord> PrefixTree::searchWords(const string &word)
 
         if (lastMatchNode)
         {
-            // 特殊处理：匹配到的是+或-，检查是否为浮点数的一部分
+            // 【特殊处理】匹配到的是+或-，检查是否为浮点数的一部分e+3；e-3
             if ((lastMatchNode->wordType == dic["+"] || lastMatchNode->wordType == dic["-"]) && i >= 2 && (word[i - 2] == 'e' || word[i - 2] == 'E'))
             {
                 // 检查e之前是否全为数字或小数点
@@ -85,10 +85,8 @@ vector<lexWord> PrefixTree::searchWords(const string &word)
     return matches;
 }
 
-//-----------------------------------------------------------------------
-
-//@func :
-int lexialAnalyzer::initialLexicalAnalysis() // 初始化
+/* 初始化 */
+int lexialAnalyzer::initialLexicalAnalysis()
 {
     // 初始化符号字典
     for (int i = 0; i < VTSIZE; ++i)
@@ -100,7 +98,7 @@ int lexialAnalyzer::initialLexicalAnalysis() // 初始化
     return 1;
 }
 
-//@func :
+/* 重置 */
 int lexialAnalyzer::refresh(void)
 {
     if (charTypes != NULL)
@@ -115,14 +113,14 @@ int lexialAnalyzer::refresh(void)
     return RETURN_FINE;
 }
 
-//@func : 设置文本对应的片段属性
+/* 设置文本对应的片段属性 */
 void lexialAnalyzer::spiltType(string str, int st, int ed, int type)
 {
     fragments.emplace_back(str, st, ed, type); // 再看看
     fill(charTypes + st, charTypes + ed, type);
 }
 
-//@func : 处理注释，字符，字符串，分隔符
+/* 处理注释，字符，字符串，分隔符 */
 void lexialAnalyzer::preProcess()
 {
     bool inSingleLineComment = false;
@@ -253,7 +251,7 @@ bool lexialAnalyzer::isBoolean(const string &str)
     return false;
 }
 
-//@func : 判别无符号整数,认为有前导0的整数合法
+// 判别无符号整数,认为有前导0的整数合法
 bool lexialAnalyzer::isInt(const string &str)
 {
     int state = 0;
@@ -280,7 +278,7 @@ bool lexialAnalyzer::isInt(const string &str)
     return (state == 3);
 }
 
-//@func : 判别浮点数
+// 判别浮点数
 bool lexialAnalyzer::isFloat(const string &str)
 {
     char state = '0'; // 初始状态
@@ -360,7 +358,7 @@ bool lexialAnalyzer::isFloat(const string &str)
     return (state == '9');
 }
 
-//@func : 判别标识符
+// 判别标识符
 bool lexialAnalyzer::isIdentifier(const string &str)
 {
     int state = 0;
@@ -387,13 +385,11 @@ bool lexialAnalyzer::isIdentifier(const string &str)
     return (state == 2);
 }
 
-//@func : 字符分析
+// 字符分析
 void lexialAnalyzer::lexialAnalyzeToken(const string &code)
 {
-    //	this->refresh();
-
     if (charTypes != NULL)
-    { // 文件中的每一个字符对应的类型
+    {
         delete[] charTypes;
         charTypes = NULL;
     }
@@ -409,7 +405,8 @@ void lexialAnalyzer::lexialAnalyzeToken(const string &code)
     {
         charTypes[i] = dic["NULL"];
     }
-    preProcess();
+
+    preProcess(); /* 处理注释，字符，字符串，分隔符 */
 
     string temp = sourceCode;
     for (int i = 0; i < sourceCodeLength; i++)
@@ -420,10 +417,12 @@ void lexialAnalyzer::lexialAnalyzeToken(const string &code)
 
     vector<lexWord> res = trie.searchWords(temp); // 假设存在的字符串匹配函数
 
+    // 处理运算符
     for (const auto &match : res)
         if (match.lexType >= dic["{"] && match.lexType <= dic[";"])
             spiltType(sourceCode.substr(match.start, match.end - match.start + 1), match.start, match.end, match.lexType); // 标记为已处理
 
+    // 处理关键字
     for (const auto &match : res)
     {
         if (match.lexType >= dic["auto"] && match.lexType <= dic["while"])
@@ -438,6 +437,7 @@ void lexialAnalyzer::lexialAnalyzeToken(const string &code)
         }
     }
 
+    // 整数、浮点数、标识符以及错误的其他单词
     int start = -1;
     for (int i = 0; i <= sourceCodeLength; i++)
     {
@@ -527,6 +527,7 @@ int lexialAnalyzer::lexialAnalyze(const char *inPath, const char *outPath, const
     string buf = "";           // 读入缓冲区
     vector<lexWord> res;
 
+    // 宏定义、单行注释、多行注释、字符串、字符、分隔符
     while (getline(inFile, buf))
     {
         buf += "\n"; // 补足getline未读入的换行符

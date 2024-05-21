@@ -1,7 +1,7 @@
 int main(void){
-	int b;
-	b=1;
-	b=3;
-	a=12;
-	return a;
+	int yt;
+	yt=1;
+	yt=3;
+	li=12;
+	return li;
 }

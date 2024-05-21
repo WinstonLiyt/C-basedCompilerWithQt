@@ -1,21 +1,17 @@
-//@func   :  编译分析总程序
-
 #include "analyzer.h"
 
-//-----------------------------------------------------------------------
-//@func : 初始化
 Compile_Analyzer::Compile_Analyzer()
 {
     this->labelGenerator = LabelGenerator(0, "T");
 }
 
-// @func : 获取函数表
+// 获取函数表
 vector<Func> Compile_Analyzer::getFunTable(void)
 {
     return (this->funcTable);
 }
 
-// @func : 绘制树sub【graphics】
+// 绘制树sub【graphics】
 void Compile_Analyzer::generateSubtreeShape(ofstream &outputStream, Tree *&node)
 {
     if (node->children.size())
@@ -34,7 +30,7 @@ void Compile_Analyzer::generateSubtreeConnections(ofstream &outputStream, Tree *
         generateSubtreeConnections(outputStream, node->children[i]);
 }
 
-// @func : 绘制树【graphics】
+// 绘制树【graphics】
 void Compile_Analyzer::generateSyntaxTree(stack<vector<int>> &parseStack, const char *outputFilePath)
 {
     int nodeIdentifier = 0;      // 用来唯一标识某个树节点
@@ -55,7 +51,7 @@ void Compile_Analyzer::generateSyntaxTree(stack<vector<int>> &parseStack, const 
         VariableStack.push(newNode);
     }
 
-    // ---- LR1分析最左规约 --> 最右推导 ----
+    // LR1分析最左规约 --> 最右推导
     while (parseStack.size())
     {
         vector<int> currentProduction = parseStack.top();
@@ -92,7 +88,6 @@ void Compile_Analyzer::generateSyntaxTree(stack<vector<int>> &parseStack, const 
         }
     }
 
-    // ---- 使用graphics软件打印图 ----
     ofstream outputStream(outputFilePath, ios::out);
     outputStream << "digraph SyntaxTree {" << endl;
     outputStream << "rankdir = TB;" << endl;
@@ -101,9 +96,7 @@ void Compile_Analyzer::generateSyntaxTree(stack<vector<int>> &parseStack, const 
     outputStream << "}" << endl;
 }
 
-//-----------------------------------------------------------------------
-
-//@func : 获取词法分析结果
+// 获取词法分析结果
 int Compile_Analyzer::get_words(const char *lexInput)
 {
     // 初始化words序列
@@ -131,7 +124,7 @@ int Compile_Analyzer::get_words(const char *lexInput)
     return RETURN_FINE;
 }
 
-//@func : 从语法分析器获得各项数据信息
+// 从语法分析器获得各项数据信息
 int Compile_Analyzer::get_value_from_syn(void)
 {
     this->symbolMap = this->syntaxAnalyzer.symbolMap;         // 非终结&终结符转化,1-85为终结符，86-112为非终结符，舍弃旧字符，这里跟原来很不一样
@@ -144,7 +137,7 @@ int Compile_Analyzer::get_value_from_syn(void)
     return RETURN_FINE;
 }
 
-//@func : 从文档数据中获取LR1表相关数据
+// 从文档数据中获取LR1表相关数据
 int Compile_Analyzer::get_LR1_tables(const char *fileProduction, const char *fileTableLR1, const char *fileTableSR)
 {
     this->get_value_from_syn();
@@ -155,17 +148,15 @@ int Compile_Analyzer::get_LR1_tables(const char *fileProduction, const char *fil
     return RETURN_FINE;
 }
 
-//@func :
 int Compile_Analyzer::initForAll(void)
 {
     // 构建词法分析的字典树
     this->lexicalAnalyzer.initialLexicalAnalysis();
 
     // 构建LR1表
-    return this->syntaxAnalyzer.syntax_analyze_LR1Table();
+    return this->syntaxAnalyzer.syntaxAnalyzeLR1Table();
 }
 
-//@func :
 int Compile_Analyzer::refresh(void)
 {
     this->tokens.clear();
@@ -184,13 +175,11 @@ int Compile_Analyzer::refresh(void)
     return RETURN_FINE;
 }
 
-//@func :
 int Compile_Analyzer::lexAnalyzer(void)
 {
     return this->lexicalAnalyzer.lexialAnalyze();
 }
 
-//@func :
 int Compile_Analyzer::synAnalyzer(void)
 {
     if (this->get_words() == RETURN_FINE &&
@@ -201,14 +190,12 @@ int Compile_Analyzer::synAnalyzer(void)
         return RETURN_ERROR;
 }
 
-//@func :
 int Compile_Analyzer::semAnalyzer(void)
 {
     interCodeGenerator.Output((folderPath + semCode).c_str());
     return RETURN_FINE;
 }
 
-//@func :
 int Compile_Analyzer::interAnalyzer(void)
 {
     this->interCodeGenerator.DivideIntoFunctionBlocks(this->getFunTable());                    // 划分功能块
@@ -223,7 +210,6 @@ int Compile_Analyzer::interAnalyzer(void)
     return RETURN_FINE;
 }
 
-//@func :
 int Compile_Analyzer::objAnalyzer(void)
 {
     this->objectCodeGenerator.generateCode();

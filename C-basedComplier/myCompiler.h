@@ -167,8 +167,8 @@ private:
     bool isLex;
     bool isSyn;
     bool isSem;
-    bool isItermediate;
-    bool isObject;
+    bool isMed;
+    bool isObj;
 
 private:
     QMap<int, CodeWidgetTab *> tabTextEditMap;

@@ -168,8 +168,8 @@ myCompiler::myCompiler(QWidget *parent) : QMainWindow(parent)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 创建tmp临时文件夹
     if (0 != access(folderPath.c_str(), 0))
@@ -491,8 +491,8 @@ void myCompiler::actionLexicalAnalyze_triggered(void)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 删除所有临时文件
     deleteFolderContents(QString::fromStdString(folderPath));
@@ -625,7 +625,7 @@ void myCompiler::actionToken_Type_triggered(void)
 void myCompiler::actionLexAnalyzer_triggered(void)
 {
     // 加载 SVG 文件
-    QString svgFilePath = "../C-basedComplier/src/lexAnalyzer.svg";
+    QString svgFilePath = "lexAnalyzer.svg";
     QFile svgFile(svgFilePath);
     qDebug() << svgFilePath;
     if (!svgFile.exists())
@@ -670,8 +670,8 @@ void myCompiler::actionSyntacticAnalyze_triggered(void)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 删除所有临时文件
     deleteFolderContents(QString::fromStdString(folderPath));
@@ -958,8 +958,8 @@ void myCompiler::actionSemanticAnalyze_triggered(void)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 删除所有临时文件
     deleteFolderContents(QString::fromStdString(folderPath));
@@ -1041,8 +1041,8 @@ void myCompiler::actionIntermediateCode_triggered(void)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 删除所有临时文件
     deleteFolderContents(QString::fromStdString(folderPath));
@@ -1117,7 +1117,7 @@ void myCompiler::actionIntermediateCode_triggered(void)
         return;
     }
     else
-        this->isItermediate = true;
+        this->isMed = true;
     Message = ">>> 源代码的中间代码生成已完成！";
     this->message_show();
 
@@ -1129,10 +1129,10 @@ void myCompiler::actionIntermediateCode_triggered(void)
 
 void myCompiler::actioninterCode_triggered()
 {
-    if (!this->isItermediate)
+    if (!this->isMed)
     {
-        QMessageBox::warning(this, tr("Warning"), tr("【警告】请先完成语义分析过程！"));
-        Message = ">>> 【警告】请先完成语义分析过程！";
+        QMessageBox::warning(this, tr("Warning"), tr("【警告】请先完成中间代码生成过程！"));
+        Message = ">>> 【警告】请先完成中间代码生成过程！";
         this->message_show();
         return;
     }
@@ -1199,7 +1199,7 @@ void myCompiler::actioninterCode_triggered()
 
 void myCompiler::actionfuncBlock_triggered()
 {
-    if (!this->isItermediate)
+    if (!this->isMed)
     {
         QMessageBox::warning(this, tr("Warning"), tr("【警告】请先完成中间代码生成过程！"));
         Message = ">>> 【警告】请先完成中间代码生成过程！";
@@ -1246,7 +1246,7 @@ void myCompiler::actionfuncBlock_triggered()
 
 void myCompiler::actionwaitUseTable_triggered()
 {
-    if (!this->isItermediate)
+    if (!this->isMed)
     {
         QMessageBox::warning(this, tr("Warning"), tr("【警告】请先完成中间代码生成过程！"));
         Message = ">>> 【警告】请先完成中间代码生成过程！";
@@ -1345,8 +1345,8 @@ void myCompiler::actionObjectCode_triggered(void)
     this->isLex = false;
     this->isSyn = false;
     this->isSem = false;
-    this->isItermediate = false;
-    this->isObject = false;
+    this->isMed = false;
+    this->isObj = false;
 
     // 删除所有临时文件
     deleteFolderContents(QString::fromStdString(folderPath));
@@ -1421,7 +1421,7 @@ void myCompiler::actionObjectCode_triggered(void)
         return;
     }
     else
-        this->isItermediate = true;
+        this->isMed = true;
     Message = ">>> 6. 进入目标代码生成...";
     if (this->anaylzer.objAnalyzer() == RETURN_ERROR)
     {
@@ -1432,7 +1432,7 @@ void myCompiler::actionObjectCode_triggered(void)
     }
     else
 
-        this->isObject = true;
+        this->isObj = true;
     Message = ">>> 源代码的目标代码生成已完成！";
     this->message_show();
 
@@ -1444,7 +1444,7 @@ void myCompiler::actionObjectCode_triggered(void)
 
 void myCompiler::actiongenCode_triggered(void)
 {
-    if (!this->isObject)
+    if (!this->isObj)
     {
         QMessageBox::warning(this, tr("Warning"), tr("【警告】请先完成目标代码生成过程！"));
         Message = ">>> 【警告】请先完成目标代码生成过程！";
@@ -1509,7 +1509,7 @@ void myCompiler::actiongenCode_triggered(void)
 //@func :
 void myCompiler::actionSave_ObjectCode_triggered(void)
 {
-    if (this->isObject)
+    if (this->isObj)
     {
         string path = folderPath;
         string name = objCode;

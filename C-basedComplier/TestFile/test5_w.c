@@ -1,11 +1,11 @@
 int main(void){
 	int a;
 	int b;
-	int gonzalez;
-	gonzalez=256;
-	b=23;
-	a=99;
-	gonzalez=a*b;
-	gonzalez=a*gonzalez
-	return gonzalez;
+	int lyt;
+	lyt = 256;
+	b = 128;
+	a = 64;
+	lyt = a * b;
+	lyt = a * lyt
+	return lyt;
 }

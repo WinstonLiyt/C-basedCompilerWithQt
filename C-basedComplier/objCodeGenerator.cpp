@@ -1,5 +1,3 @@
-//@func   :  目标代码生成器代码
-
 #include "objCodeGenerator.h"
 
 bool isNum(string blockName)
@@ -7,20 +5,18 @@ bool isNum(string blockName)
 	return isdigit(blockName[0]);
 }
 
-//@func :
 VariableInfo::VariableInfo(int next, bool isActive)
 {
 	this->next = next;
 	this->isActive = isActive;
 }
-//@func :
+
 VariableInfo::VariableInfo(const VariableInfo &other)
 {
 	this->isActive = other.isActive;
 	this->next = other.next;
 }
 
-//@func :
 int objectCodeGenerator::refresh(void)
 {
 	this->funcInfoBlocks.clear();
@@ -38,7 +34,7 @@ int objectCodeGenerator::refresh(void)
 	return RETURN_FINE;
 }
 
-//@func : 存储变量
+// 存储变量
 void objectCodeGenerator::storeVariable(string reg, string var)
 {
 	// 如果已经为*iter分配好了存储空间
@@ -54,7 +50,7 @@ void objectCodeGenerator::storeVariable(string reg, string var)
 	variableAddressDescriptor[var].insert(var);
 }
 
-//@func : 释放变量
+// 释放变量
 void objectCodeGenerator::releaseVariable(string var)
 {
 	for (set<string>::iterator iter = variableAddressDescriptor[var].begin(); iter != variableAddressDescriptor[var].end(); iter++)
@@ -69,7 +65,7 @@ void objectCodeGenerator::releaseVariable(string var)
 	variableAddressDescriptor[var].clear();
 }
 
-//@func : 为引用变量分配寄存器
+// 为引用变量分配寄存器
 string objectCodeGenerator::allocateRegister()
 {
 
@@ -180,7 +176,8 @@ string objectCodeGenerator::allocateRegister()
 
 	return ret;
 }
-//@func : 为引用变量分配寄存器
+
+// 为引用变量分配寄存器
 string objectCodeGenerator::allocateRegister(string var)
 {
 
@@ -205,7 +202,7 @@ string objectCodeGenerator::allocateRegister(string var)
 	return ret;
 }
 
-//@func : 为目标变量分配寄存器
+// 为目标变量分配寄存器
 string objectCodeGenerator::allocateRegisterForTarget()
 {
 
@@ -251,7 +248,6 @@ bool isVariable(string blockName)
 	return isalpha(blockName[0]);
 }
 
-//@func :
 void objectCodeGenerator::analyseFuncBlocks(vector<FuncBlock> *funcBlocks)
 {
 	// 遍历所有的函数块
@@ -449,7 +445,8 @@ void objectCodeGenerator::analyseFuncBlocks(vector<FuncBlock> *funcBlocks)
 		functionSerialNames[funBlockIter->serial] = funBlockIter->name;
 	}
 }
-//@func :
+
+/* 处理活跃变量的存储，确保在控制流改变前，所有必要的变量都被保存到内存中，以便在后续使用时能够恢复其状态 */
 void objectCodeGenerator::storeExitLiveVariables(set<string> &outl)
 {
 	for (set<string>::iterator oiter = outl.begin(); oiter != outl.end(); oiter++)
@@ -477,7 +474,8 @@ void objectCodeGenerator::storeExitLiveVariables(set<string> &outl)
 		}
 	}
 }
-//@func :
+
+/* 处理单个四元式，进行寄存器分配和目标代码的生成。它包括跳转、条件分支、函数调用和返回指令的处理，以及普通算术和赋值操作的代码生成 */
 void objectCodeGenerator::generateQuaternaryCode(int nowBaseBlockIndex, int &arg_num, int &par_num, list<pair<string, bool>> &par_list)
 {
 	// 检查当前四元式的操作数是否在使用前已经被定义
@@ -615,7 +613,6 @@ void objectCodeGenerator::generateQuaternaryCode(int nowBaseBlockIndex, int &arg
 	}
 }
 
-//@func :
 bool isControlOP(string op)
 {
 	if (op[0] == 'j' || op == "call" || op == "return" || op == "get")
@@ -623,7 +620,7 @@ bool isControlOP(string op)
 	return false;
 }
 
-//@func :生成一个基本块内的目标代码。基本块是一段没有分支（除了入口和出口）的代码序列。
+/* 生成一个基本块内的目标代码。基本块是一段没有分支（除了入口和出口）的代码序列 */
 void objectCodeGenerator::generateBaseBlocks(int nowBaseBlockIndex)
 {
 
@@ -682,7 +679,8 @@ void objectCodeGenerator::generateBaseBlocks(int nowBaseBlockIndex)
 			generateQuaternaryCode(nowBaseBlockIndex, arg_num, par_num, par_list);
 	}
 }
-//@func :遍历一个函数中的所有基本块
+
+/* 遍历一个函数中的所有基本块 */
 void objectCodeGenerator::generateFunBlocks(map<string, vector<InfoBlock>>::iterator &fiter)
 {
 
@@ -697,7 +695,8 @@ void objectCodeGenerator::generateFunBlocks(map<string, vector<InfoBlock>>::iter
 		generateBaseBlocks(currentInfoBlock - InfoBlocks.begin());
 	}
 }
-//@func :初始化代码生成所需的数据结构
+
+// 初始化代码生成所需的数据结构
 void objectCodeGenerator::generateCode()
 {
 	generatedCode.push_back("lui $sp,0x1001"); // 初始化栈指针
@@ -710,7 +709,7 @@ void objectCodeGenerator::generateCode()
 	generatedCode.push_back("end:");
 }
 
-//@func :生成目标代码
+// 生成目标代码
 void objectCodeGenerator::outputGeneratedCode(const char *fileName)
 {
 	ofstream fout(fileName);
@@ -727,7 +726,6 @@ void objectCodeGenerator::outputGeneratedCode(const char *fileName)
 	}
 }
 
-//@func :
 void VariableInfo::print(ostream &fileout)
 {
 	fileout << "(";
@@ -744,7 +742,6 @@ void VariableInfo::print(ostream &fileout)
 	fileout << ")";
 }
 
-//@func :
 void QuaternaryWithInfo::print(ostream &fileout)
 {
 	fileout << "(" << quad.op << "," << quad.src1 << "," << quad.src2 << "," << quad.dst << ")";
@@ -753,7 +750,7 @@ void QuaternaryWithInfo::print(ostream &fileout)
 	dstInfo.print(fileout);
 }
 
-//@func :生成待用活-跃信息表
+// 生成待用活-跃信息表
 void objectCodeGenerator::outputInfoBlocksDetails(ostream &fileout)
 {
 	for (map<string, vector<InfoBlock>>::iterator iter = funcInfoBlocks.begin(); iter != funcInfoBlocks.end(); iter++)
@@ -775,44 +772,4 @@ void objectCodeGenerator::outputInfoBlocksDetails(ostream &fileout)
 			}
 		}
 	}
-}
-
-//@func :没用到
-void objectCodeGenerator::outputEntryExitLiveVariables(ostream &fileout)
-{
-	for (auto iterOut = this->exitLiveVariables.begin(), iterIn = this->entryLiveVariables.begin(); (iterOut != this->exitLiveVariables.end()) && (iterIn != this->entryLiveVariables.end()); ++iterIn, ++iterOut)
-	{
-		fileout << "[function]" << iterOut->first << "\n";
-		// 遍历活跃变量表中的变量
-		int blockIndex = 0;
-		for (auto BiterOut = iterOut->second.begin(), BiterIn = iterIn->second.begin(); (BiterOut != iterOut->second.end()) && (BiterIn != iterIn->second.end()); ++BiterIn, ++BiterOut, ++blockIndex)
-		{
-			fileout << "[block]" << blockIndex << "\n";
-			// In
-			fileout << "		"
-					<< "IN  : ";
-			for (auto IiterIn = BiterIn->begin(); (IiterIn != BiterIn->end()); ++IiterIn)
-			{
-				fileout << *IiterIn << " ";
-			}
-			fileout << "\n";
-			// Out
-			fileout << "		"
-					<< "OUT : ";
-			for (auto IiterOut = BiterOut->begin(); (IiterOut != BiterOut->end()); ++IiterOut)
-			{
-				fileout << *IiterOut << " ";
-			}
-			fileout << "\n";
-		}
-	}
-}
-//@func :没用到
-void objectCodeGenerator::outputVariableOffsets(ostream &fileout)
-{
-	for (auto iter = this->variableStorageOffset.begin(); iter != this->variableStorageOffset.end(); ++iter)
-	{
-		fileout << iter->first << " " << iter->second << endl;
-	}
-	return;
 }

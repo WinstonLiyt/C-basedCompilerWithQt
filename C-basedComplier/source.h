@@ -10,22 +10,8 @@
 #include <QTextBrowser>
 
 using namespace std;
-
-// ---------------- 注意事项 ----------------
-// 1.暂时未考虑float型，若考虑将修改产生式
-// 2.暂时未考虑数组，若考虑将修改产生式
-// 3.暂时未考虑宏定义，若考虑将在词法分析后处理宏定义
-
-// ---------------- 命名规则 ----------------
-// 1.变量、结构体:驼峰法
-// 2.函数:下划线、小写
-// 3.类:下划线、大写
-// 4.宏定义:全大写
-// 5.资源文件:全大写
-
 extern string Message;
 
-// ---------------- 资源文件 ----------------
 // 终结符列表
 #define VTSIZE 85
 static const char *VTNAMES[] = {
@@ -157,12 +143,10 @@ static const char *PATTERNS[] = {
     "declare_list,declare",
     "declare,'int','Identifier',M,A,function_declare",
     "declare,'int','Identifier',var_declare",
-    //"declare,'int','Identifier',array_declare",           //数组定义
     "declare,'void','Identifier',M,A,function_declare",
     "A,emptypro",
     "var_declare,';'",
     "function_declare,'(',parameter,')',sentence_block",
-    //"array_declare,'[',Integer,']'",                      //数组定义
     "parameter,parameter_list",
     "parameter,'void'",
     "parameter_list,param",
@@ -200,7 +184,6 @@ static const char *PATTERNS[] = {
     "item,factor,'*',item",
     "item,factor,'/',item",
     "factor,'Integer'",
-    //"factor,'Floating'",                                  //浮点型数据
     "factor,'(',expression,')'",
     "factor,'Identifier','(',argument_list,')'",
     "factor,'Identifier'",
@@ -208,8 +191,6 @@ static const char *PATTERNS[] = {
     "argument_list,expression",
     "argument_list,expression,',',argument_list",
     "NULL"};
-
-//-----------------------------------------------------------------------
 
 #define START_STATE 0 // 初始态   -->  从1开始！！！
 #define START_WORD 0  // 初始栈底 -->  '#'
@@ -225,17 +206,14 @@ static const char *PATTERNS[] = {
 
 #define NONIDLE -1 // 非待用
 
-//-----------------------------------------------------------------------
-
-//@func : 数据类型（int/void）
+// 数据类型（int/void）
 enum DType
 {
     VOIDType,
     INTType
 };
 
-//-----------------------------------------------------------------------
-//@func : 四元式结构体
+// 四元式结构体
 struct Quaternary
 {
     string op;   // 操作符
@@ -243,7 +221,8 @@ struct Quaternary
     string src2; // 源操作数2
     string dst;  // 目的操作数
 };
-//@func : 基本快
+
+// 基本块
 struct Block
 {
     string name;              // 基本块的名称
@@ -251,14 +230,16 @@ struct Block
     int next1;                // 基本块的下一连接块
     int next2;                // 基本块的下一连接块
 };
-//@func : 基本功能块
+
+// 基本功能块
 struct FuncBlock
 {
     string serial;        // 基本功能块编号
     string name;          // 基本功能块的名字
     vector<Block> blocks; // 基本功能块
 };
-//@func : 绘制树结构体
+
+// 绘制树结构体
 struct Tree
 {
     int key;
@@ -270,21 +251,24 @@ struct Tree
         value = v;
     }
 };
-//@func : 从词法分析结果读取到的值
+
+// 从词法分析结果读取到的值
 struct Token
 {
     int id;
     string tokenType;
     string tokenValue;
 };
-//@func : 变量表结构体
+
+// 变量表结构体
 struct Var
 {
     string name;
     DType type;
     int level;
 };
-//@func : 函数表结构体
+
+// 函数表结构体
 struct Func
 {
     string name;
@@ -292,8 +276,9 @@ struct Func
     list<DType> paramTypes;
     int enterPoint;
 };
-//@func : 项目集结构体 | eg : S -> .BB, #
-struct Item // 单个项目
+
+// 项目集结构体 | eg : S -> .BB, # （单个项目）
+struct Item
 {
     int nump;       // 产生式编号
     int ppos;       //.的位置
@@ -303,15 +288,14 @@ struct Item // 单个项目
         return nump == other.nump && ppos == other.ppos && forward == other.forward;
     }
 };
-//@func : 项目集族无向图边结构体
+
+// 项目集族无向图边结构体
 struct Edge
 {
     int from;      // 以链表形式串联记录edge的所属
     int toItemSet; // 该条edge的指向的项目集
     int weight;    // 对应的V
 };
-
-//-----------------------------------------------------------------------
 
 // 文件夹
 const string folderPath = "./tmp/"; // 临时文件夹
@@ -341,7 +325,5 @@ const string funcFile = "funcTable.txt"; // 代码生成的函数表
 // 默认保存的文件名
 const string defaultCodeSavePath = "./files/"; // 默认保存的文件目录
 const string defaultCodeSaveFile = "unnamed";  // 默认保存code文件名
-
-// const string defaultAnsSaveFile = "ans.txt";            //默认保存ans文件名
 
 #endif // !_SOURCE_H
